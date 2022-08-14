@@ -214,19 +214,3 @@ profile /opt/google/chrome/chrome {
 
 
 ----------------------------------------------------------------------------------------------------------------
-Minimal apparmor profile for Chrome on Ubuntu 22.04. File contains all that's necessary to run Chrome. It does not have any mention of /bin or /sbin programs. And does not give blanket read rights to /tmp, /run, /dev, /sys. /etc, /home/yourAccount/Documents directories. It was developed by carefully inspecting strace output. Even if hackers manage to compromise Chrome, they would not be able to do anything useful.
-
-Which brings me to firejail. It is a virtualization security app. Which run it's protected apps in a virtual environment. Firejail claims to protect 1000 common apps. ( I haven't counted their config files in /etc/firejail )
-
-Apparmor job is to protect an app by only allowing specified modules and file read and writes to only the select few specified things. If an attacker manages to use only the specified few things to accomplish his hack, then apparmor cannot protect us any further. Virtualization comes in and provides a virtual environment to run the app in. And wipes away the environment after use and ensures that nothing of a hack remains, like for example, a rootkit.
-
-You can never be 100% certain that your apps do not harbour any security vulnerabilities. And hackers know these and pass them around. White hat hackers would report security vulnerabilities and create a CVS report so that the app developers can fix them. But black hat hackers far out number white hats. White hats can earn serious money by reporting vulnerabilities and yet black hat hackers still persist. But black hats can maybe earn more by blackmailing people with ransomware. And by the way, the apparmor profile above only allows writes to the Downloads folder, so your Documents folder is safe. Be aware also that the default snap packaged Firefox apparmor profile allows reads and writes to the ENTIRE home folder - I wouldn't use that if I were you.
-
-Firejail is easy to use. Just install firejail and run 'sudo firecfg'. It creates some .desktop files under 'home/yourAccount/.local/share/applications. These are your protected applications and they show up in the 'Show Applications' 9 dot icon.
-
-You can modify these .desktop files to add more security features of firejail. Just sudo gedit a .desktop file and look for the Exec line. Then add options between the word 'firejail' and the part that starts the app.
-
-For example mine has this portion added: '--ignore=private-dev --caps.drop=all --machine-id --net=enp1s0 --dns=9.9.9.9 --netfilter=/etc/firejail/nolocal.net ' . This portion specifies that it should create a virtual network 'card' with a temporary ip address. And that ip address changes every time you start your app. It also has an '--ignore=private dev' so I can use my usb Yubikey hardware token to sign on to facebook and email.
-If you are not using Ubuntu, you should change 'enp1s0' to 'eth0'.
-
-BTW, Yubikeys are the definitive 2nd factor authentication method. Costs $25. More secure than a cell phone app, as cell phones can be hacked, especially Andriods.
